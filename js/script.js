@@ -256,12 +256,13 @@ window.addEventListener('DOMContentLoaded', () => {
     function postData(form) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            let formData = new FormData(form);
-            let object = {};
-            formData.forEach((value, key) => {
-                object[key] = value;
-            });
-            let json = JSON.stringify(object);
+            let formData = new FormData(form),
+                json = JSON.stringify(Object.fromEntries(formData));
+            // let object = {};
+            // formData.forEach((value, key) => {
+            //     object[key] = value;
+            // });
+            // let json = JSON.stringify(object);
             fetch('http://localhost:3000/requests', {
                 method: 'POST',
                 headers: {
@@ -328,5 +329,86 @@ window.addEventListener('DOMContentLoaded', () => {
     // .then(data => data.json())
     // .then(data => console.log(data));
     
+    // slider
+    let slider = document.querySelector('.offer__slider'),
+        currentNumber = slider.querySelector('#current'),
+        totalNumber = slider.querySelector('#total'),
+        arrowNext = slider.querySelector('.offer__slider-next'),
+        arrowPrev = slider.querySelector('.offer__slider-prev'),
+        sliderWrapper = slider.querySelector('.offer__slider-wrapper'),
+        sliderInner = slider.querySelector('.offer__slider-inner'),
+        slide = slider.querySelectorAll('.offer__slide'),
+        counter = 0;
 
+        slide.forEach(item => item.style.width = '100%');
+
+        sliderWrapper.style.overflow = 'hidden';
+        sliderWrapper.style.position = 'relative';
+        let carousel = document.createElement('div');
+        carousel.classList.add('carousel-indicators');
+        sliderWrapper.append(carousel);
+
+        for (let i = 0; i < slide.length; i++) {
+            let dot = document.createElement('div');
+            dot.classList.add('dot');
+            carousel.append(dot);
+        }
+
+        let dots = document.querySelectorAll('.dot');
+
+        sliderInner.style.display = 'flex';
+        sliderInner.style.width = `${slide.length * 100}%`;
+        if (slide.length < 10) {
+            totalNumber.textContent = `0${slide.length}`;
+        } else {
+            totalNumber.textContent = slide.length;
+        }
+
+        sliderInner.style.transition = `0.4s all`;
+
+        function slideControl() {
+            if (counter < 0) {
+                counter = slide.length - 1;
+            } else if (counter > slide.length - 1) {
+                counter = 0;
+            }
+
+            if (counter < 10) {
+                currentNumber.textContent = `0${counter + 1}`;
+            } else {
+                currentNumber.textContent = counter + 1;
+            }
+            sliderInner.style.transform = `translate(-${counter * window.getComputedStyle(slide[counter]).width.slice(0, -2)}px)`;
+        } 
+
+        slideControl();
+
+        arrowPrev.addEventListener('click', () => {
+            counter -= 1;
+            slideControl();
+            dotsControl(counter);
+        });
+
+        arrowNext.addEventListener('click', () => {
+            counter += 1;
+            slideControl();
+            dotsControl(counter);
+        });
+
+        function dotsControl(num) {
+            dots.forEach(item => item.classList.remove('dot-active'));
+            dots[num].classList.add('dot-active');
+            
+            dots.forEach((item, i) => {
+                item.addEventListener('click', () => {
+                    dots.forEach(item => item.classList.remove('dot-active'));
+                    item.classList.add('dot-active');
+                    counter = i;
+                    slideControl();
+                });
+            });
+        }
+
+    dotsControl(counter);
+    
 });
