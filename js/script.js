@@ -410,5 +410,79 @@ window.addEventListener('DOMContentLoaded', () => {
         }
 
     dotsControl(counter);
-    
+
+    // calculator
+
+    let chooseGender = document.querySelectorAll('#gender > .calculating__choose-item'),
+        genderValue = document.querySelector('#gender .calculating__choose-item_active').getAttribute('genderV'),
+        gender = document.querySelector('#gender .calculating__choose-item_active').getAttribute('gender'),
+        height,
+        weight,
+        age,
+        physicalActivity = document.querySelectorAll('.calculating__choose_big > .calculating__choose-item'),
+        activityValue = document.querySelector('.calculating__choose_big .calculating__choose-item_active').getAttribute('activity-multiplier'),
+        caloriesResult = document.querySelector('.calculating__result > span');
+
+    function genderCalc(selector, attribute, genderAttr) {
+        selector.forEach((item) => {
+            item.addEventListener('click', () => {
+                selector.forEach((item) => {
+                    item.classList.remove('calculating__choose-item_active');
+                });
+                item.classList.add('calculating__choose-item_active');
+                genderValue = item.getAttribute(attribute);
+                gender = item.getAttribute(genderAttr);
+                caloriesCalculation(gender);
+            });
+        });
+    }
+
+    function activityCalc(selector) {
+        selector.forEach((item) => {
+            item.addEventListener('click', () => {
+                selector.forEach((item) => {
+                    item.classList.remove('calculating__choose-item_active');
+                });
+                item.classList.add('calculating__choose-item_active');
+                activityValue = item.getAttribute('activity-multiplier');
+                caloriesCalculation();
+            });
+        });
+    }
+
+    function calcHWA(selector) {
+        let input = document.querySelector(selector);
+        input.addEventListener('input', () => {
+            switch(input.getAttribute('id')) {
+                case "height":
+                    height = +input.value;
+                    break;
+                case "weight":
+                    weight = +input.value;
+                    break;
+                case "age":
+                    age = +input.value;
+                    break;
+            }
+            caloriesCalculation();
+        });
+    }
+
+    function caloriesCalculation() {
+        if (!weight || !height || !age) {
+            caloriesResult.textContent = '-- ';
+        } else if (gender === 'woman') {
+            caloriesResult.textContent = Math.floor((+genderValue + 9.2 * weight + 3.6 * height - 4.7 * age) * activityValue * 10) / 10;
+        } else if (gender === 'man') {
+            caloriesResult.textContent = Math.floor((+genderValue + 13.5 * weight + 4.8 * height - 5.2 * age) * activityValue * 10) / 10;
+        }
+    }
+
+    genderCalc(chooseGender, 'genderV', 'gender');
+    activityCalc(physicalActivity);
+    calcHWA('#height');
+    calcHWA('#weight');
+    calcHWA('#age');
+    caloriesCalculation();
+      
 });
